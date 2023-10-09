@@ -13,15 +13,37 @@ function MyApp() {
     }, [] );
 
     function removeOneCharacter (index) {
-        const updated = characters.filter((character, i) => {
-            return i !== index
-        });
-        setCharacters(updated);
+        deleteFromList(index)
+            .then((response) => {
+                if (response.status === 204) {
+                    const updated = characters.filter((character, i) => {
+                        return i !== index
+                    });
+                    setCharacters(updated);
+                } else {
+                    console.error('User deletion failed.');
+                }
+            })
+
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
     function updateList(person) {
         postUser(person)
-            .then(() => setCharacters([...characters, person]))
+            .then((response) => {
+                if (response.status === 201) {
+                    return response.json();
+                } else {
+                    console.error('User insertion failed.');
+                }
+            }).then(data => {
+                person.name = data.name;
+                person.job = data.job;
+                setCharacters([...characters, person])
+        })
+
             .catch((error) => {
                 console.log(error);
             })
@@ -29,6 +51,15 @@ function MyApp() {
 
     function fetchUsers() {
         const promise = fetch("http://localhost:8000/users");
+        return promise;
+    }
+
+    function deleteFromList(index) {
+        //get person from index then replace person.id
+        const promise = fetch("Http://localhost:8000/users/" + characters[index].id + "/delete",
+            {
+                method: "DELETE",
+            });
         return promise;
     }
 

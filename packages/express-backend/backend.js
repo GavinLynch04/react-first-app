@@ -37,9 +37,25 @@ const users = {
 app.use(cors());
 app.use(express.json());
 
+
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
+const generateID = () => {
+    let ID = "";
+    ID = ID + String.fromCharCode(Math.random() * 26 + 97);
+    ID = ID + String.fromCharCode(Math.random() * 26 + 97);
+    ID = ID + String.fromCharCode(Math.random() * 26 + 97);
+    ID = ID + String.fromCharCode(Math.random() * 10 + 48);
+    ID = ID + String.fromCharCode(Math.random() * 10 + 48);
+    ID = ID + String.fromCharCode(Math.random() * 10 + 48);
+    if (findUserById(ID) === undefined) {
+        return ID;
+    } else {
+        return generateID();
+    }
+}
 
 const findUserByName = (name) => {
     return users['users_list']
@@ -80,23 +96,29 @@ const addUser = (user) => {
 const deleteUser = (user) => {
     let userID = findUserById(user);
     if (userID === undefined) {
-        res.status(404).send('Resource not found.');
+        return -1;
     } else {
         let loc = users['users_list'].indexOf(userID);
         users['users_list'].splice(loc, 1)
-        return userID;
+        return 0;
     }
 }
 
-app.get('/users/:id/delete', (req, res) => {
+app.delete('/users/:id/delete', (req, res) => {
     const id = req.params['id'];
-    deleteUser(id);
-    res.send();
+    if (deleteUser(id) === -1) {
+        res.status(404).send('Resource not found.');
+    } else {
+        res.status(204).send();
+    }
 })
+
 
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
+    userToAdd.id = generateID();
     addUser(userToAdd);
+    res.status(201).json(userToAdd);
     res.send();
 });
 
