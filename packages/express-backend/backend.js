@@ -70,6 +70,34 @@ app.get('/users/:id', (req, res) => {
     }
 });
 
+const addUser = (user) => {
+    users['users_list'].push(user);
+    return user;
+}
+
+const deleteUser = (user) => {
+    let userID = findUserById(user);
+    if (userID === undefined) {
+        res.status(404).send('Resource not found.');
+    } else {
+        let loc = users['users_list'].indexOf(userID);
+        users['users_list'].splice(loc, 1)
+        return userID;
+    }
+}
+
+app.get('/users/:id/delete', (req, res) => {
+    const id = req.params['id'];
+    deleteUser(id);
+    res.send();
+})
+
+app.post('/users', (req, res) => {
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.send();
+});
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
