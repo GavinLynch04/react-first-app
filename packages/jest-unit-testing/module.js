@@ -31,7 +31,6 @@ export default class Portfolio {
         }
     }
 
-
     shareCount(stockName) {
         return this.stockCountList[this.stockNameList.indexOf(stockName)];
     }
