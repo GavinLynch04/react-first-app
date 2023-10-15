@@ -1,17 +1,38 @@
-function sum(a, b) {
-    return a + b;
-}
+import ShareSaleException from "./ShareSaleException.js";
 
-function div (a, b){
-    return a / b;
-}
-
-function containsNumbers(text){
-    for (let i = 0; i < text.length; i++) {
-        if (!isNaN(text.charAt(i)))
-            return true;
+export default class Portfolio {
+    constructor(stockNameList = [], stockCountList = []) {
+        this.stockNameList = stockNameList;
+        this.stockCountList = stockCountList;
     }
-    return false;
-}
 
-export default { sum, div, containsNumbers };
+    isEmpty() {
+        return this.stockNameList.length === 0;
+    }
+
+    countUnique() {
+        return this.stockNameList.length;
+    }
+
+    purchaseShares(stockName, stockAmount) {
+        this.stockNameList.push(stockName);
+        this.stockCountList.push(stockAmount);
+    }
+
+    sellShares(stockName, stockAmount) {
+        const index = this.stockNameList.indexOf(stockName);
+        if(stockAmount > this.stockCountList[index]) {
+            throw new ShareSaleException("Cannot sell more shares than owned.");
+        } else if (stockAmount === this.stockCountList[index]) {
+            this.stockNameList.splice(index, 1);
+            this.stockCountList.splice(index, 1);
+        } else {
+            this.stockCountList[index] -= stockAmount;
+        }
+    }
+
+
+    shareCount(stockName) {
+        return this.stockCountList[this.stockNameList.indexOf(stockName)];
+    }
+}
